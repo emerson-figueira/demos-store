@@ -1,0 +1,1333 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DEMO - LPs & CDs Usados</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Special+Elite&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --black: #0a0a0a;
+      --white: #f0f0f0;
+      --red: #e63946;
+      --gray: #2a2a2a;
+      --dark-gray: #1a1a1a;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Special Elite', monospace;
+      background-color: var(--black);
+      color: var(--white);
+      overflow-x: hidden;
+    }
+
+    /* Glitch effect */
+    .glitch {
+      position: relative;
+      animation: glitch-skew 1s infinite linear alternate-reverse;
+    }
+
+    .glitch::before,
+    .glitch::after {
+      content: attr(data-text);
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    .glitch::before {
+      left: 2px;
+      text-shadow: -2px 0 var(--red);
+      clip: rect(44px, 450px, 56px, 0);
+      animation: glitch-anim 5s infinite linear alternate-reverse;
+    }
+
+    .glitch::after {
+      left: -2px;
+      text-shadow: -2px 0 #00ff00;
+      clip: rect(44px, 450px, 56px, 0);
+      animation: glitch-anim2 5s infinite linear alternate-reverse;
+    }
+
+    @keyframes glitch-anim {
+      0% { clip: rect(31px, 9999px, 94px, 0); }
+      20% { clip: rect(70px, 9999px, 16px, 0); }
+      40% { clip: rect(6px, 9999px, 84px, 0); }
+      60% { clip: rect(88px, 9999px, 44px, 0); }
+      80% { clip: rect(23px, 9999px, 71px, 0); }
+      100% { clip: rect(54px, 9999px, 19px, 0); }
+    }
+
+    @keyframes glitch-anim2 {
+      0% { clip: rect(65px, 9999px, 99px, 0); }
+      20% { clip: rect(12px, 9999px, 53px, 0); }
+      40% { clip: rect(91px, 9999px, 28px, 0); }
+      60% { clip: rect(38px, 9999px, 77px, 0); }
+      80% { clip: rect(5px, 9999px, 62px, 0); }
+      100% { clip: rect(82px, 9999px, 35px, 0); }
+    }
+
+    @keyframes glitch-skew {
+      0% { transform: skew(0deg); }
+      10% { transform: skew(-2deg); }
+      20% { transform: skew(2deg); }
+      30% { transform: skew(0deg); }
+      100% { transform: skew(0deg); }
+    }
+
+    /* Noise overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1000;
+      opacity: 0.04;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    }
+
+    /* Header */
+    header {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    .hero-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.3;
+      filter: grayscale(100%) contrast(150%);
+    }
+
+    .hero-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(230, 57, 70, 0.03) 2px,
+        rgba(230, 57, 70, 0.03) 4px
+      );
+    }
+
+    .logo-container {
+      position: relative;
+      z-index: 10;
+      text-align: center;
+    }
+
+    .logo {
+      font-family: 'Anton', sans-serif;
+      font-size: clamp(4rem, 15vw, 12rem);
+      letter-spacing: -0.05em;
+      text-transform: uppercase;
+      color: var(--white);
+      line-height: 0.9;
+      text-shadow: 4px 4px 0 var(--red), 8px 8px 0 var(--black);
+    }
+
+    .tagline {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: clamp(0.8rem, 2vw, 1.2rem);
+      color: var(--red);
+      margin-top: 1rem;
+      letter-spacing: 0.5em;
+      text-transform: uppercase;
+    }
+
+    /* Navigation */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--black);
+      border-bottom: 3px solid var(--red);
+      padding: 1rem 2rem;
+    }
+
+    .nav-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .nav-logo {
+      font-family: 'Anton', sans-serif;
+      font-size: 1.5rem;
+      color: var(--red);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+      flex-wrap: wrap;
+    }
+
+    .nav-links a {
+      color: var(--white);
+      text-decoration: none;
+      font-family: 'Share Tech Mono', monospace;
+      text-transform: uppercase;
+      font-size: 0.9rem;
+      letter-spacing: 0.1em;
+      position: relative;
+      transition: color 0.3s;
+    }
+
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -5px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: var(--red);
+      transition: width 0.3s;
+    }
+
+    .nav-links a:hover {
+      color: var(--red);
+    }
+
+    .nav-links a:hover::after {
+      width: 100%;
+    }
+
+    .cart-icon {
+      font-family: 'Share Tech Mono', monospace;
+      color: var(--red);
+      cursor: pointer;
+      font-size: 1.2rem;
+    }
+
+    /* Sections */
+    section {
+      padding: 4rem 2rem;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 3rem;
+      position: relative;
+    }
+
+    .section-header::before {
+      content: '//';
+      color: var(--red);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 1.5rem;
+    }
+
+    .section-title {
+      font-family: 'Anton', sans-serif;
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .section-line {
+      flex: 1;
+      height: 3px;
+      background: repeating-linear-gradient(
+        90deg,
+        var(--red),
+        var(--red) 10px,
+        transparent 10px,
+        transparent 15px
+      );
+    }
+
+    /* Novidades Banner */
+    .novidades-banner {
+      background: var(--red);
+      padding: 0.8rem;
+      text-align: center;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      animation: blink 2s infinite;
+      cursor: pointer;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+
+    /* Product Grid */
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 2rem;
+    }
+
+    .product-card {
+      background: var(--dark-gray);
+      border: 2px solid var(--gray);
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s;
+      cursor: pointer;
+    }
+
+    .product-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(230, 57, 70, 0.1), transparent);
+      transition: left 0.5s;
+    }
+
+    .product-card:hover::before {
+      left: 100%;
+    }
+
+    .product-card:hover {
+      border-color: var(--red);
+      transform: translateY(-5px);
+      box-shadow: 0 10px 30px rgba(230, 57, 70, 0.2);
+    }
+
+    .product-image {
+      width: 100%;
+      aspect-ratio: 1;
+      object-fit: cover;
+      filter: grayscale(30%) contrast(120%);
+      transition: filter 0.3s;
+    }
+
+    .product-card:hover .product-image {
+      filter: grayscale(0%) contrast(100%);
+    }
+
+    .product-info {
+      padding: 1.5rem;
+    }
+
+    .product-tag {
+      display: inline-block;
+      background: var(--red);
+      color: var(--white);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.7rem;
+      padding: 0.2rem 0.6rem;
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+    }
+
+    .product-tag.novo {
+      background: #00ff00;
+      color: var(--black);
+    }
+
+    .product-tag.raro {
+      background: #ff9500;
+      color: var(--black);
+    }
+
+    .product-title {
+      font-family: 'Anton', sans-serif;
+      font-size: 1.3rem;
+      margin-bottom: 0.3rem;
+      line-height: 1.1;
+    }
+
+    .product-artist {
+      font-family: 'Share Tech Mono', monospace;
+      color: #888;
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+    }
+
+    .product-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid var(--gray);
+      padding-top: 1rem;
+    }
+
+    .product-price {
+      font-family: 'Anton', sans-serif;
+      font-size: 1.5rem;
+      color: var(--red);
+    }
+
+    .product-price .currency {
+      font-size: 0.8rem;
+      vertical-align: top;
+    }
+
+    .product-format {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.8rem;
+      color: #666;
+      border: 1px solid var(--gray);
+      padding: 0.3rem 0.6rem;
+    }
+
+    .add-cart {
+      position: absolute;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      width: 40px;
+      height: 40px;
+      background: var(--red);
+      border: none;
+      color: var(--white);
+      font-size: 1.2rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s;
+      opacity: 0;
+      transform: translateY(10px);
+    }
+
+    .product-card:hover .add-cart {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .add-cart:hover {
+      background: var(--white);
+      color: var(--red);
+    }
+
+    /* Categories */
+    .categories {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 2rem;
+    }
+
+    .category-btn {
+      background: transparent;
+      border: 2px solid var(--gray);
+      color: var(--white);
+      font-family: 'Share Tech Mono', monospace;
+      text-transform: uppercase;
+      padding: 0.6rem 1.5rem;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-size: 0.85rem;
+    }
+
+    .category-btn:hover,
+    .category-btn.active {
+      border-color: var(--red);
+      color: var(--red);
+      background: rgba(230, 57, 70, 0.1);
+    }
+
+    /* About Section */
+    .about-section {
+      background: var(--dark-gray);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .about-section::before {
+      content: 'DEMO DEMO DEMO';
+      position: absolute;
+      font-family: 'Anton', sans-serif;
+      font-size: 15rem;
+      color: rgba(255, 255, 255, 0.02);
+      white-space: nowrap;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotate(-5deg);
+      pointer-events: none;
+    }
+
+    .about-content {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+      align-items: center;
+    }
+
+    .about-text p {
+      margin-bottom: 1.5rem;
+      line-height: 1.8;
+      font-size: 1.1rem;
+    }
+
+    .about-text .highlight {
+      color: var(--red);
+      font-family: 'Anton', sans-serif;
+      font-size: 1.3rem;
+    }
+
+    .about-stats {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 2rem;
+    }
+
+    .stat-item {
+      text-align: center;
+      padding: 2rem;
+      border: 2px solid var(--gray);
+      position: relative;
+    }
+
+    .stat-item::after {
+      content: '';
+      position: absolute;
+      top: 5px;
+      left: 5px;
+      right: -5px;
+      bottom: -5px;
+      border: 2px solid var(--red);
+      z-index: -1;
+    }
+
+    .stat-number {
+      font-family: 'Anton', sans-serif;
+      font-size: 3rem;
+      color: var(--red);
+      line-height: 1;
+    }
+
+    .stat-label {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      margin-top: 0.5rem;
+      color: #888;
+    }
+
+    /* Newsletter */
+    .newsletter {
+      border: 3px solid var(--red);
+      padding: 3rem;
+      text-align: center;
+      position: relative;
+    }
+
+    .newsletter::before {
+      content: 'SUBSCRIBE';
+      position: absolute;
+      top: -15px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--black);
+      padding: 0 1rem;
+      font-family: 'Share Tech Mono', monospace;
+      color: var(--red);
+      font-size: 0.9rem;
+    }
+
+    .newsletter h3 {
+      font-family: 'Anton', sans-serif;
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    .newsletter-form {
+      display: flex;
+      gap: 1rem;
+      max-width: 500px;
+      margin: 2rem auto 0;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .newsletter-input {
+      flex: 1;
+      min-width: 250px;
+      background: var(--dark-gray);
+      border: 2px solid var(--gray);
+      color: var(--white);
+      padding: 1rem;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+
+    .newsletter-input:focus {
+      border-color: var(--red);
+    }
+
+    .newsletter-btn {
+      background: var(--red);
+      color: var(--white);
+      border: none;
+      padding: 1rem 2rem;
+      font-family: 'Anton', sans-serif;
+      text-transform: uppercase;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .newsletter-btn:hover {
+      background: var(--white);
+      color: var(--red);
+    }
+
+    /* Footer */
+    footer {
+      background: var(--dark-gray);
+      border-top: 3px solid var(--red);
+      padding: 3rem 2rem 2rem;
+    }
+
+    .footer-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 3rem;
+    }
+
+    .footer-column h4 {
+      font-family: 'Anton', sans-serif;
+      font-size: 1.2rem;
+      margin-bottom: 1.5rem;
+      color: var(--red);
+    }
+
+    .footer-column ul {
+      list-style: none;
+    }
+
+    .footer-column li {
+      margin-bottom: 0.8rem;
+    }
+
+    .footer-column a {
+      color: #888;
+      text-decoration: none;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.9rem;
+      transition: color 0.3s;
+    }
+
+    .footer-column a:hover {
+      color: var(--red);
+    }
+
+    .footer-bottom {
+      max-width: 1400px;
+      margin: 3rem auto 0;
+      padding-top: 2rem;
+      border-top: 1px solid var(--gray);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .footer-logo {
+      font-family: 'Anton', sans-serif;
+      font-size: 2rem;
+      color: var(--red);
+    }
+
+    .footer-copy {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.8rem;
+      color: #666;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .about-content {
+        grid-template-columns: 1fr;
+      }
+      
+      .nav-links {
+        gap: 1rem;
+      }
+      
+      .product-grid {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      }
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 10px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--black);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--red);
+    }
+
+    /* Selection */
+    ::selection {
+      background: var(--red);
+      color: var(--white);
+    }
+
+    /* Tape effect */
+    .tape {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.3);
+      padding: 0.5rem 2rem;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.7rem;
+      transform: rotate(-15deg);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    }
+
+    /* Marquee */
+    .marquee-container {
+      overflow: hidden;
+      background: var(--red);
+      padding: 0.5rem 0;
+    }
+
+    .marquee {
+      display: flex;
+      animation: marquee 20s linear infinite;
+      white-space: nowrap;
+    }
+
+    .marquee span {
+      font-family: 'Anton', sans-serif;
+      font-size: 1.2rem;
+      text-transform: uppercase;
+      padding: 0 2rem;
+      color: var(--black);
+    }
+
+    @keyframes marquee {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.9);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal {
+      background: var(--dark-gray);
+      border: 3px solid var(--red);
+      max-width: 900px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      position: relative;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: var(--red);
+      color: var(--white);
+      border: none;
+      width: 40px;
+      height: 40px;
+      font-size: 1.5rem;
+      cursor: pointer;
+      z-index: 10;
+    }
+
+    .modal-content {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .modal-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: grayscale(30%);
+    }
+
+    .modal-details {
+      padding: 2rem;
+    }
+
+    .modal-details h2 {
+      font-family: 'Anton', sans-serif;
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .modal-details .artist {
+      font-family: 'Share Tech Mono', monospace;
+      color: var(--red);
+      font-size: 1.1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .modal-details .description {
+      line-height: 1.8;
+      margin-bottom: 2rem;
+      color: #ccc;
+    }
+
+    .modal-details .tracklist {
+      margin-bottom: 2rem;
+    }
+
+    .modal-details .tracklist h4 {
+      font-family: 'Anton', sans-serif;
+      margin-bottom: 1rem;
+      color: var(--red);
+    }
+
+    .modal-details .tracklist ol {
+      padding-left: 1.5rem;
+      color: #aaa;
+    }
+
+    .modal-details .tracklist li {
+      margin-bottom: 0.5rem;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.9rem;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .modal-price {
+      font-family: 'Anton', sans-serif;
+      font-size: 2.5rem;
+      color: var(--red);
+    }
+
+    .modal-buy {
+      flex: 1;
+      background: var(--red);
+      color: var(--white);
+      border: none;
+      padding: 1rem;
+      font-family: 'Anton', sans-serif;
+      text-transform: uppercase;
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .modal-buy:hover {
+      background: var(--white);
+      color: var(--red);
+    }
+
+    @media (max-width: 768px) {
+      .modal-content {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Cart count badge */
+    .cart-count {
+      display: inline-block;
+      background: var(--white);
+      color: var(--black);
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      text-align: center;
+      line-height: 20px;
+      font-size: 0.7rem;
+      margin-left: 0.3rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header / Hero -->
+  <header>
+    <img src="https://mcp-tools-z-image-turbo.hf.space/--replicas/dc2z9/gradio_api/file=/tmp/gradio/1c3a496a37971f5ccf0e62dd7bd2bdad2fb7c26da6b7cf46206b88545c0226b6/image.webp" alt="Punk rock aesthetic" class="hero-bg">
+    <div class="hero-overlay"></div>
+    <div class="logo-container">
+      <h1 class="logo glitch" data-text="DEMO">DEMO</h1>
+      <p class="tagline">LPs & CDs Usados // Desde 2006</p>
+    </div>
+  </header>
+
+  <!-- Novidades Banner -->
+  <div class="novidades-banner" onclick="scrollToNovidades()">
+    ⚡ CLIQUE AQUI PARA VER AS NOVIDADES DA SEMANA ⚡
+  </div>
+
+  <!-- Navigation -->
+  <nav>
+    <div class="nav-container">
+      <div class="nav-logo">DEMO</div>
+      <ul class="nav-links">
+        <li><a href="#novidades">Novidades</a></li>
+        <li><a href="#vinil">Vinil</a></li>
+        <li><a href="#cds">CDs</a></li>
+        <li><a href="#cassete">Cassetes</a></li>
+        <li><a href="#sobre">Sobre</a></li>
+        <li><a href="#contato">Contato</a></li>
+      </ul>
+      <div class="cart-icon" onclick="toggleCart()">
+        CARRINHO <span class="cart-count" id="cartCount">0</span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Marquee -->
+  <div class="marquee-container">
+    <div class="marquee">
+      <span>NOVIDADES TODA SEMANA</span>
+      <span>///</span>
+      <span>ENVIAMOS PARA TODO O BRASIL</span>
+      <span>///</span>
+      <span>LPs RAROS E IMPORTADOS</span>
+      <span>///</span>
+      <span>PUNK ROCK • HARDCORE • METAL • INDIE</span>
+      <span>///</span>
+      <span>NOVIDADES TODA SEMANA</span>
+      <span>///</span>
+      <span>ENVIAMOS PARA TODO O BRASIL</span>
+      <span>///</span>
+      <span>LPs RAROS E IMPORTADOS</span>
+      <span>///</span>
+      <span>PUNK ROCK • HARDCORE • METAL • INDIE</span>
+      <span>///</span>
+    </div>
+  </div>
+
+  <!-- Novidades Section -->
+  <section id="novidades">
+    <div class="section-header">
+      <h2 class="section-title">Novidades</h2>
+      <div class="section-line"></div>
+    </div>
+    
+    <div class="categories">
+      <button class="category-btn active">Todos</button>
+      <button class="category-btn">Vinil</button>
+      <button class="category-btn">CD</button>
+      <button class="category-btn">Cassete</button>
+      <button class="category-btn">Raros</button>
+    </div>
+
+    <div class="product-grid" id="novidadesGrid">
+      <!-- Products will be injected by JS -->
+    </div>
+  </section>
+
+  <!-- Vinil Section -->
+  <section id="vinil">
+    <div class="section-header">
+      <h2 class="section-title">Vinil</h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="product-grid" id="vinilGrid"></div>
+  </section>
+
+  <!-- CDs Section -->
+  <section id="cds">
+    <div class="section-header">
+      <h2 class="section-title">CDs</h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="product-grid" id="cdsGrid"></div>
+  </section>
+
+  <!-- Sobre Section -->
+  <section class="about-section" id="sobre">
+    <div class="section-header" style="padding-top: 4rem; max-width: 1400px; margin: 0 auto;">
+      <h2 class="section-title">Sobre a Demo</h2>
+      <div class="section-line"></div>
+    </div>
+    <div class="about-content" style="padding: 0 2rem 4rem; max-width: 1400px; margin: 0 auto;">
+      <div class="about-text">
+        <p>
+          A <span class="highlight">DEMO</span> nasceu em 2006 no porão de um bar em São Paulo, entre cervejas baratas e discussões sobre quem era mais punk: Johnny Rotten ou Jello Biafra.
+        </p>
+        <p>
+          Somos uma loja especializada em <span class="highlight">vinil, CDs e cassetes usados</span> — com foco em punk rock, hardcore, metal e tudo que tiver atitude. Não vendemos música de elevador. Não vendemos "vinil colorido de edição limitada do Spotify". Vendemos história, suor e ruido.
+        </p>
+        <p>
+          Cada disco que entra aqui é revisado, limpo e avaliado com o rigor de quem já perdeu uma coleção inteira em um show de chuva. <span class="highlight">Se não toca direito, não vendemos.</span>
+        </p>
+      </div>
+      <div class="about-stats">
+        <div class="stat-item">
+          <div class="stat-number">15K+</div>
+          <div class="stat-label">Discos Vendidos</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">18</div>
+          <div class="stat-label">Anos no Subsolo</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">4.2K</div>
+          <div class="stat-label">Clientes Fiéis</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">0</div>
+          <div class="stat-label">Paciência para Pop</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Newsletter -->
+  <section>
+    <div class="newsletter">
+      <h3>NÃO PERCA AS NOVIDADES</h3>
+      <p style="color: #888; font-family: 'Share Tech Mono', monospace; font-size: 0.9rem;">
+        Cadastre seu e-mail e seja o primeiro a saber quando chegar aquele raro que você procura há anos.
+      </p>
+      <form class="newsletter-form" onsubmit="event.preventDefault(); alert('Cadastrado! Prepare-se para o spam de qualidade.');">
+        <input type="email" class="newsletter-input" placeholder="seu@email.com" required>
+        <button type="submit" class="newsletter-btn">Cadastrar</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer id="contato">
+    <div class="footer-content">
+      <div class="footer-column">
+        <h4>Loja Física</h4>
+        <ul>
+          <li><a href="#">Rua Augusta, 666 - Baixo</a></li>
+          <li><a href="#">São Paulo - SP</a></li>
+          <li><a href="#">Seg a Sex: 14h às 20h</a></li>
+          <li><a href="#">Sáb: 12h às 18h</a></li>
+        </ul>
+      </div>
+      <div class="footer-column">
+        <h4>Categorias</h4>
+        <ul>
+          <li><a href="#">Punk Rock</a></li>
+          <li><a href="#">Hardcore</a></li>
+          <li><a href="#">Metal</a></li>
+          <li><a href="#">Indie / Alternativo</a></li>
+          <li><a href="#">Pós-Punk</a></li>
+          <li><a href="#">Noise / Experimental</a></li>
+        </ul>
+      </div>
+      <div class="footer-column">
+        <h4>Atendimento</h4>
+        <ul>
+          <li><a href="#">contato@demodiscos.com</a></li>
+          <li><a href="#">WhatsApp: (11) 99999-6666</a></li>
+          <li><a href="#">Trocas e Devoluções</a></li>
+          <li><a href="#">Envio e Frete</a></li>
+          <li><a href="#">Avaliação de Coleções</a></li>
+        </ul>
+      </div>
+      <div class="footer-column">
+        <h4>Redes</h4>
+        <ul>
+          <li><a href="#">Instagram</a></li>
+          <li><a href="#">Facebook</a></li>
+          <li><a href="#">YouTube</a></li>
+          <li><a href="#">Discogs</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-logo">DEMO</div>
+      <div class="footer-copy">© 2026 DEMO DISCOS. NENHUM DIREITO RESERVADO. COPIE, DISTRIBUA, DESTRUA.</div>
+    </div>
+  </footer>
+
+  <!-- Product Modal -->
+  <div class="modal-overlay" id="productModal">
+    <div class="modal">
+      <button class="modal-close" onclick="closeModal()">×</button>
+      <div class="modal-content" id="modalContent">
+        <!-- Injected by JS -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Product Data
+    const products = [
+      {
+        id: 1,
+        title: "Never Mind the Bollocks",
+        artist: "Sex Pistols",
+        price: 280,
+        format: "LP",
+        condition: "VG+",
+        tag: "novo",
+        image: "https://upload.wikimedia.org/wikipedia/en/thumb/4/4c/Never_Mind_the_Bollocks%2C_Here%27s_the_Sex_Pistols.png/250px-Never_Mind_the_Bollocks%2C_Here%27s_the_Sex_Pistols.png?utm_source=en.wikipedia.org&utm_campaign=parser&utm_content=thumbnail",
+        description: "Edição original brasileira de 1977. Capa com desgaste natural nas bordas, disco em excelente estado. Inclui encarte original com letras.",
+        tracklist: ["Holidays in the Sun", "Bodies", "No Feelings", "Liar", "God Save the Queen", "Problems", "Seventeen", "Anarchy in the U.K.", "Submission", "Pretty Vacant", "New York", "E.M.I."]
+      },
+      {
+        id: 2,
+        title: "Damaged",
+        artist: "Black Flag",
+        price: 320,
+        format: "LP",
+        condition: "NM",
+        tag: "raro",
+        image: "https://upload.wikimedia.org/wikipedia/en/thumb/0/00/Black_Flag_-_Damaged_cover.jpg/250px-Black_Flag_-_Damaged_cover.jpg?utm_source=en.wikipedia.org&utm_campaign=parser&utm_content=thumbnail",
+        description: "Primeira pressão SST Records de 1981. Um dos álbuns mais importantes do hardcore americano. Capa intacta, disco sem marcas de uso visíveis.",
+        tracklist: ["Rise Above", "Spray Paint", "Gimmie Gimmie Gimmie", "Depression", "Room 13", "TV Party", "Thirsty and Miserable", "Police Story", "Life of Pain", "Damaged II", "No More", "Padded Cell", "My War"]
+      },
+      {
+        id: 3,
+        title: "London Calling",
+        artist: "The Clash",
+        price: 250,
+        format: "LP",
+        condition: "VG",
+        tag: "novo",
+        image: "https://thumb.wikimedia.org/wikipedia/en/thumb/0/00/TheClashLondonCallingalbumcover.jpg/250px-TheClashLondonCallingalbumcover.jpg?utm_source=en.wikipedia.org&utm_campaign=parser&utm_content=thumbnail",
+        description: "Duplo LP importado UK. Capa com ringwear leve, discos limpos e bem conservados. Clássico absoluto do pós-punk.",
+        tracklist: ["London Calling", "Brand New Cadillac", "Jimmy Jazz", "Hateful", "Rudie Can't Fail", "Spanish Bombs", "The Right Profile", "Lost in the Supermarket", "Clampdown", "The Guns of Brixton", "Wrong 'Em Boyo", "Death or Glory", "Koka Kola", "The Card Cheat", "Lover's Rock", "Four Horsemen", "I'm Not Down", "Revolution Rock", "Train in Vain"]
+      },
+      {
+        id: 4,
+        title: "Fresh Fruit for Rotting Vegetables",
+        artist: "Dead Kennedys",
+        price: 290,
+        format: "LP",
+        condition: "VG+",
+        tag: "novo",
+        image: "https://upload.wikimedia.org/wikipedia/en/thumb/2/22/Dead_Kennedys_-_Fresh_Fruit_for_Rotting_Vegetables_cover.jpg/250px-Dead_Kennedys_-_Fresh_Fruit_for_Rotting_Vegetables_cover.jpg?utm_source=en.wikipedia.org&utm_campaign=parser&utm_content=thumbnail",
+        description: "Edição original Cherry Red/IRS 1980. Capa de Winston Smith em ótimo estado. Punk rock satírico no auge.",
+        tracklist: ["Kill the Poor", "Forward to Death", "When Ya Get Drafted", "Let's Lynch the Landlord", "Drug Me", "Your Emotions", "Chemical Warfare", "California Über Alles", "I Kill Children", "Stealing People's Mail", "Funland at the Beach", "Ill in the Head", "Holiday in Cambodia", "Viva Las Vegas"]
+      },
+      {
+        id: 5,
+        title: "Unknown Pleasures",
+        artist: "Joy Division",
+        price: 350,
+        format: "LP",
+        condition: "NM",
+        tag: "raro",
+        image: "https://thumb.wikimedia.org/wikipedia/en/thumb/5/5a/UnknownPleasuresVinyl.jpg/250px-UnknownPleasuresVinyl.jpg?utm_source=en.wikipedia.org&utm_campaign=parser&utm_content=thumbnail",
+        description: "Factory Records original de 1979. Capa icônica de Peter Saville. Disco em estado quase novo, raro de encontrar assim.",
+        tracklist: ["Disorder", "Day of the Lords", "Candidate", "Insight", "New Dawn Fades", "She's Lost Control", "Shadowplay", "Wilderness", "Interzone", "I Remember Nothing"]
+      },
+      {
+        id: 6,
+        title: "Rocket to Russia",
+        artist: "Ramones",
+        price: 220,
+        format: "LP",
+        condition: "VG",
+        tag: "novo",
+        image: "https://thumb.wikimedia.org/wikipedia/en/thumb/5/50/Ramones_-_Rocket_to_Russia_cover.jpg/250px-Ramones_-_Rocket_to_Russia_cover.jpg?utm_source=en.wikipedia.org&utm_campaign=parser&utm_content=thumbnail",
+        description: "Sire Records 1977. Terceiro álbum dos Ramones, considerado por muitos o melhor da banda. Capa com leve desgaste, disco tocando perfeitamente.",
+        tracklist: ["Cretin Hop", "Rockaway Beach", "Here Today, Gone Tomorrow", "Locket Love", "I Don't Care", "Sheena Is a Punk Rocker", "We're a Happy Family", "Teenage Lobotomy", "Do You Wanna Dance?", "I Wanna Be Well", "I Can't Give You Anything", "Ramona", "Surfin' Bird", "Why Is It Always This Way?"]
+      },
+      {
+        id: 7,
+        title: "In Utero",
+        artist: "Nirvana",
+        price: 180,
+        format: "CD",
+        condition: "NM",
+        tag: "novo",
+        image: "https://thumb.wikimedia.org/wikipedia/en/thumb/e/e5/In_Utero_%28Nirvana%29_album_cover.jpg/250px-In_Utero_%28Nirvana%29_album_cover.jpg?utm_source=en.wikipedia.org&utm_campaign=parser&utm_content=thumbnail",
+        description: "Edição original DGC 1993 com encarte completo. CD sem riscos. Inclui faixa bônus 'Gallons of Rubbing Alcohol Flow Through the Strip' na edição europeia.",
+        tracklist: ["Serve the Servants", "Scentless Apprentice", "Heart-Shaped Box", "Rape Me", "Frances Farmer Will Have Her Revenge on Seattle", "Dumb", "Very Ape", "Milk It", "Pennyroyal Tea", "Radio Friendly Unit Shifter", "Tourette's", "All Apologies"]
+      },
+      {
+        id: 8,
+        title: "Daydream Nation",
+        artist: "Sonic Youth",
+        price: 200,
+        format: "CD",
+        condition: "VG+",
+        tag: "novo",
+        image: "https://thumb.wikimedia.org/wikipedia/en/thumb/a/ad/Daydreamnation.png/250px-Daydreamnation.png?utm_source=en.wikipedia.org&utm_campaign=parser&utm_content=thumbnail",
+        description: "Blast First 1988, duplo CD. Encarte com letras e artes de Richard Kern. Estado impecável para a idade.",
+        tracklist: ["Teen Age Riot", "Silver Rocket", "The Sprawl", "'Cross the Breeze", "Eric's Trip", "Total Trash", "Hey Joni", "Providence", "Candle", "Rain King", "Kissability", "Trilogy: a) The Wonder", "Trilogy: b) Hyperstation", "Trilogy: z) Eliminator Jr."]
+      }
+    ];
+
+    let cart = [];
+
+    function renderProducts() {
+      const novidadesGrid = document.getElementById('novidadesGrid');
+      const vinilGrid = document.getElementById('vinilGrid');
+      const cdsGrid = document.getElementById('cdsGrid');
+
+      // Novidades (first 4 products)
+      products.slice(0, 4).forEach(p => {
+        novidadesGrid.innerHTML += createProductCard(p);
+      });
+
+      // Vinil (LP format)
+      products.filter(p => p.format === 'LP').forEach(p => {
+        vinilGrid.innerHTML += createProductCard(p);
+      });
+
+      // CDs
+      products.filter(p => p.format === 'CD').forEach(p => {
+        cdsGrid.innerHTML += createProductCard(p);
+      });
+    }
+
+    function createProductCard(product) {
+      const tagClass = product.tag === 'novo' ? 'novo' : (product.tag === 'raro' ? 'raro' : '');
+      const tagText = product.tag === 'novo' ? 'NOVIDADE' : (product.tag === 'raro' ? 'RARO' : '');
+      
+      return `
+        <div class="product-card" onclick="openModal(${product.id})">
+          <div style="position: relative;">
+            <img src="${product.image}" alt="${product.title}" class="product-image">
+            ${product.tag ? `<span class="product-tag ${tagClass}" style="position: absolute; top: 1rem; left: 1rem;">${tagText}</span>` : ''}
+            <div class="tape" style="top: 1rem; right: -0.5rem;">${product.condition}</div>
+          </div>
+          <div class="product-info">
+            <div class="product-title">${product.title}</div>
+            <div class="product-artist">${product.artist}</div>
+            <div class="product-meta">
+              <div class="product-price"><span class="currency">R$</span>${product.price}</div>
+              <div class="product-format">${product.format}</div>
+            </div>
+          </div>
+          <button class="add-cart" onclick="event.stopPropagation(); addToCart(${product.id})">+</button>
+        </div>
+      `;
+    }
+
+    function openModal(id) {
+      const product = products.find(p => p.id === id);
+      if (!product) return;
+
+      const modal = document.getElementById('productModal');
+      const content = document.getElementById('modalContent');
+
+      content.innerHTML = `
+        <img src="${product.image}" alt="${product.title}" class="modal-image">
+        <div class="modal-details">
+          <h2>${product.title}</h2>
+          <div class="artist">${product.artist}</div>
+          <p class="description">${product.description}</p>
+          <div class="tracklist">
+            <h4>FAIXAS</h4>
+            <ol>
+              ${product.tracklist.map(t => `<li>${t}</li>`).join('')}
+            </ol>
+          </div>
+          <div class="modal-actions">
+            <div class="modal-price">R$ ${product.price}</div>
+            <button class="modal-buy" onclick="addToCart(${product.id}); closeModal();">ADICIONAR AO CARRINHO</button>
+          </div>
+          <div style="margin-top: 1.5rem; font-family: 'Share Tech Mono', monospace; font-size: 0.8rem; color: #666;">
+            FORMATO: ${product.format} | CONDIÇÃO: ${product.condition}
+          </div>
+        </div>
+      `;
+
+      modal.classList.add('active');
+    }
+
+    function closeModal() {
+      document.getElementById('productModal').classList.remove('active');
+    }
+
+    function addToCart(id) {
+      cart.push(id);
+      updateCartCount();
+    }
+
+    function updateCartCount() {
+      document.getElementById('cartCount').textContent = cart.length;
+    }
+
+    function toggleCart() {
+      if (cart.length === 0) {
+        alert('Carrinho vazio. Vai comprar alguma coisa, poser!');
+      } else {
+        alert(`${cart.length} item(s) no carrinho. Total: R$ ${cart.reduce((sum, id) => sum + products.find(p => p.id === id).price, 0)}`);
+      }
+    }
+
+    function scrollToNovidades() {
+      document.getElementById('novidades').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // Close modal on overlay click
+    document.getElementById('productModal').addEventListener('click', function(e) {
+      if (e.target === this) closeModal();
+    });
+
+    // ESC to close modal
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') closeModal();
+    });
+
+    // Category filter
+    document.querySelectorAll('.category-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+      });
+    });
+
+    // Initialize
+    renderProducts();
+  </script>
+
+</body>
+</html>
